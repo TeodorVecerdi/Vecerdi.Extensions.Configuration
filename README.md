@@ -60,7 +60,7 @@ configuration
     .AddResourcesJson("config/appsettings", environment)              // shipped defaults + appsettings.Development / appsettings.Windows
     .AddPersistentDataJson("settings.json", environment)               // per-user overrides, reloaded when the file changes
     .AddEnvironmentVariables("MYGAME_")                                // stock Microsoft source, works as is
-    .ExposeToInspector();                                              // show it in Window > Configuration
+    .ExposeToInspector();                                              // show it in Vecerdi.Extensions > Configuration
 
 var provider = new ServiceCollection()
     .AddSingleton<IConfiguration>(configuration)
@@ -105,7 +105,7 @@ defaults.
 
 ### The Configuration window
 
-`Window > Configuration` lists each registered root. Register a `ConfigurationManager` with
+`Vecerdi.Extensions > Configuration` lists each registered root. Register a `ConfigurationManager` with
 `ExposeToInspector(name)`, or any built root with `ConfigurationInspector.Register(name, root)`. The
 Provider column names the source that won for each key, which is the fastest way to find out why a
 value is not what you expected.

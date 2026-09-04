@@ -28,7 +28,7 @@ public sealed class ConfigurationWindow : EditorWindow {
     private IDisposable? m_ReloadSubscription;
     private IConfigurationRoot? m_Root;
 
-    [MenuItem("Window/Configuration")]
+    [MenuItem("Vecerdi.Extensions/Configuration")]
     public static void ShowWindow() {
         var window = GetWindow<ConfigurationWindow>();
         window.titleContent = new GUIContent("Configuration");

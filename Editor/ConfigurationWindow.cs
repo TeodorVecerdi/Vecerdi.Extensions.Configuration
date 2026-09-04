@@ -67,7 +67,7 @@ public sealed class ConfigurationWindow : EditorWindow {
             style = { flexGrow = 1 },
         };
         m_List.columns.Add(Column("Key", 0.4f, row => row.Key));
-        m_List.columns.Add(Column("Value", 0.35f, row => row.Value is null ? "<null>" : IsSecret(row.Key) && !m_ShowSecrets.value ? "••••••••" : row.Value, italicWhenNull: true));
+        m_List.columns.Add(Column("Value", 0.35f, row => row.Value is null ? "<null>" : ConfigurationInspector.LooksLikeSecret(row.Key) && !m_ShowSecrets.value ? "••••••••" : row.Value, italicWhenNull: true));
         m_List.columns.Add(Column("Provider", 0.25f, row => row.Provider));
         rootVisualElement.Add(m_List);
 
@@ -147,13 +147,6 @@ public sealed class ConfigurationWindow : EditorWindow {
             ? m_AllRows
             : m_AllRows.Where(r => r.Key.Contains(filter, StringComparison.OrdinalIgnoreCase) || (r.Value?.Contains(filter, StringComparison.OrdinalIgnoreCase) ?? false)));
         m_List.RefreshItems();
-    }
-
-    private static readonly string[] s_SecretMarkers = ["apikey", "api_key", "secret", "token", "password", "credential"];
-
-    private static bool IsSecret(string key) {
-        var last = key.LastIndexOf(':') is var i && i >= 0 ? key[(i + 1)..] : key;
-        return s_SecretMarkers.Any(marker => last.Contains(marker, StringComparison.OrdinalIgnoreCase));
     }
 
     private Column Column(string title, float widthFraction, Func<Row, string> text, bool italicWhenNull = false) {

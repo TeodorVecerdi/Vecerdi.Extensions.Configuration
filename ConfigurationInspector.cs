@@ -40,6 +40,28 @@ public static class ConfigurationInspector {
         Changed?.Invoke();
     }
 
+    private static readonly string[] s_SecretSuffixes = ["apikey", "api_key", "api-key", "secret", "password", "passwd", "credential", "credentials", "accesstoken", "access_token", "refreshtoken", "refresh_token", "authtoken", "auth_token", "bearertoken", "idtoken", "sessiontoken"];
+
+    /// <summary>
+    /// Whether a key names something that should not be shown in clear by default. Judged on the last
+    /// path segment as a word: <c>ApiKey</c>, <c>ClientSecret</c>, <c>AccessToken</c> and <c>Token</c>
+    /// count; <c>MaxOutputTokens</c> or <c>TokenBudget</c> do not.
+    /// </summary>
+    public static bool LooksLikeSecret(string key) {
+        var last = key.LastIndexOf(ConfigurationPath.KeyDelimiter, StringComparison.Ordinal) is var i && i >= 0 ? key[(i + ConfigurationPath.KeyDelimiter.Length)..] : key;
+        if (last.Equals("token", StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+
+        foreach (var suffix in s_SecretSuffixes) {
+            if (last.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// The provider whose value wins for <paramref name="path"/>, or <c>null</c> when no provider has it.
     /// Mirrors what <c>IConfigurationRoot.GetDebugView</c> reports, without rendering the whole tree.

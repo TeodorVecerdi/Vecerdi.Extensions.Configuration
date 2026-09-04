@@ -169,6 +169,20 @@ public sealed class UnitySourcesTests {
         Assert.Throws<InvalidOperationException>(() => new ConfigurationBuilder().ExposeToInspector());
     }
 
+    [TestCase("AI:Providers:Anthropic:ApiKey", true)]
+    [TestCase("Auth:ClientSecret", true)]
+    [TestCase("Auth:AccessToken", true)]
+    [TestCase("Auth:Token", true)]
+    [TestCase("Db:Password", true)]
+    [TestCase("AI:Providers:Anthropic:Models:0:MaxOutputTokens", false)]
+    [TestCase("AI:Providers:Anthropic:Models:0:Reasoning:MaxBudgetTokens", false)]
+    [TestCase("Tokenizer:Name", false)]
+    [TestCase("Secrets:Path", false)]
+    [TestCase("ApiKeyStorage:Location", false)]
+    public void LooksLikeSecret_JudgesTheLastSegmentAsAWord(string key, bool expected) {
+        Assert.That(ConfigurationInspector.LooksLikeSecret(key), Is.EqualTo(expected));
+    }
+
     [Test]
     public void HostEnvironment_PlatformNames_AreShort() {
         Assert.That(UnityHostEnvironment.PlatformNameFor(UnityEngine.RuntimePlatform.WindowsPlayer), Is.EqualTo("Windows"));

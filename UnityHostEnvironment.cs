@@ -1,3 +1,4 @@
+using Unity.Scripting.LifecycleManagement;
 using UnityEngine;
 
 namespace Vecerdi.Extensions.Configuration;
@@ -18,29 +19,27 @@ public static class UnityEnvironments {
 /// Where the code is running, for layering configuration the way <c>appsettings.Development.json</c>
 /// does on .NET: an environment name (<see cref="UnityEnvironments"/>) plus a short platform name.
 /// </summary>
-public sealed class UnityHostEnvironment {
+[NoAutoStaticsCleanup]
+public sealed class UnityHostEnvironment(string environmentName, string platformName) {
     private static UnityHostEnvironment? s_Current;
 
     /// <summary>Detected from <c>Application.isEditor</c> and <c>Debug.isDebugBuild</c>. Must first be touched on the main thread.</summary>
     public static UnityHostEnvironment Current => s_Current ??= Detect();
 
-    public UnityHostEnvironment(string environmentName, string platformName) {
-        EnvironmentName = environmentName;
-        PlatformName = platformName;
-    }
-
     /// <summary>One of <see cref="UnityEnvironments"/>, or whatever a host chose to construct.</summary>
-    public string EnvironmentName { get; }
+    public string EnvironmentName { get; } = environmentName;
 
     /// <summary>A short platform name: <c>Windows</c>, <c>macOS</c>, <c>Linux</c>, <c>Android</c>, <c>iOS</c>, <c>WebGL</c>, or the raw <c>RuntimePlatform</c> name.</summary>
-    public string PlatformName { get; }
+    public string PlatformName { get; } = platformName;
 
     public bool IsEditor => EnvironmentName == UnityEnvironments.Editor;
     public bool IsDevelopment => EnvironmentName == UnityEnvironments.Development;
     public bool IsProduction => EnvironmentName == UnityEnvironments.Production;
 
     /// <summary>Overrides the detected environment, e.g. from a test or a launcher flag. Pass <c>null</c> to detect again.</summary>
-    public static void Override(UnityHostEnvironment? environment) => s_Current = environment;
+    public static void Override(UnityHostEnvironment? environment) {
+        s_Current = environment;
+    }
 
     private static UnityHostEnvironment Detect() {
         var name = Application.isEditor ? UnityEnvironments.Editor
@@ -59,5 +58,7 @@ public sealed class UnityHostEnvironment {
         _ => platform.ToString(),
     };
 
-    public override string ToString() => $"{EnvironmentName} ({PlatformName})";
+    public override string ToString() {
+        return $"{EnvironmentName} ({PlatformName})";
+    }
 }

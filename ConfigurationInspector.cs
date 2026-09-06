@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Unity.Scripting.LifecycleManagement;
 
 namespace Vecerdi.Extensions.Configuration;
 
@@ -6,6 +7,7 @@ namespace Vecerdi.Extensions.Configuration;
 /// The roots the editor's Configuration window can show. A host registers each root it builds (a
 /// <c>ConfigurationManager</c> can do so through <c>ExposeToInspector</c>); the window lists them by name.
 /// </summary>
+[NoAutoStaticsCleanup]
 public static class ConfigurationInspector {
     private static readonly List<Entry> s_Roots = [];
 

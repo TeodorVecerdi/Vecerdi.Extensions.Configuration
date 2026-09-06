@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
+using Unity.Scripting.LifecycleManagement;
+using UnityEngine;
 
 namespace Vecerdi.Extensions.Configuration.Tests;
 
 /// <summary>File-backed sources against a temporary directory: loading, optionality, merge order, environment layering.</summary>
 [TestFixture]
+[NoAutoStaticsCleanup]
 public sealed class UnitySourcesTests {
     private static readonly UnityHostEnvironment s_TestEnvironment = new("Testing", "TestOS");
 
@@ -157,7 +161,7 @@ public sealed class UnitySourcesTests {
     [Test]
     public void ExposeToInspector_RegistersAConfigurationManager() {
         var manager = new ConfigurationManager();
-        manager.AddInMemoryCollection([new("A", "1")]);
+        manager.AddInMemoryCollection([new KeyValuePair<string, string?>("A", "1")]);
 
         manager.ExposeToInspector("Test root");
         try {
@@ -185,9 +189,9 @@ public sealed class UnitySourcesTests {
 
     [Test]
     public void HostEnvironment_PlatformNames_AreShort() {
-        Assert.That(UnityHostEnvironment.PlatformNameFor(UnityEngine.RuntimePlatform.WindowsPlayer), Is.EqualTo("Windows"));
-        Assert.That(UnityHostEnvironment.PlatformNameFor(UnityEngine.RuntimePlatform.OSXEditor), Is.EqualTo("macOS"));
-        Assert.That(UnityHostEnvironment.PlatformNameFor(UnityEngine.RuntimePlatform.Android), Is.EqualTo("Android"));
+        Assert.That(UnityHostEnvironment.PlatformNameFor(RuntimePlatform.WindowsPlayer), Is.EqualTo("Windows"));
+        Assert.That(UnityHostEnvironment.PlatformNameFor(RuntimePlatform.OSXEditor), Is.EqualTo("macOS"));
+        Assert.That(UnityHostEnvironment.PlatformNameFor(RuntimePlatform.Android), Is.EqualTo("Android"));
         Assert.That(UnityHostEnvironment.Current.IsEditor, Is.True);
     }
 }

@@ -1,4 +1,6 @@
 using System.Threading;
+using Unity.Scripting.LifecycleManagement;
+using UnityEditor;
 using UnityEngine;
 
 namespace Vecerdi.Extensions.Configuration.MainThread;
@@ -8,6 +10,7 @@ namespace Vecerdi.Extensions.Configuration.MainThread;
 /// at subsystem registration, at editor load, and lazily by the sources on first use, so it works in
 /// play mode, in players, and in edit mode alike.
 /// </summary>
+[NoAutoStaticsCleanup]
 public static class UnityMainThread {
     private static SynchronizationContext? s_Context;
     private static int s_ThreadId;
@@ -41,7 +44,7 @@ public static class UnityMainThread {
     private static void CaptureAtStartup() => Capture();
 
 #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoadMethod]
+    [InitializeOnLoadMethod]
     private static void CaptureInEditor() => Capture();
 #endif
 }

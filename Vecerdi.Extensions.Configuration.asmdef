@@ -1,7 +1,9 @@
 {
     "name": "Vecerdi.Extensions.Configuration",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "Vecerdi.Extensions.Lifetime"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

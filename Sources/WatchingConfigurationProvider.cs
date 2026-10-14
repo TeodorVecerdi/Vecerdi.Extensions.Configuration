@@ -1,5 +1,6 @@
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Vecerdi.Extensions.Lifetime;
 using Vecerdi.Extensions.Configuration.MainThread;
 
 namespace Vecerdi.Extensions.Configuration.Sources;
@@ -18,6 +19,7 @@ public abstract class WatchingConfigurationProvider : ConfigurationProvider, IDi
     private readonly bool m_ReloadOnChange;
     private FileSystemWatcher? m_Watcher;
     private Timer? m_DebounceTimer;
+    private IDisposable? m_LifetimeRegistration;
     private bool m_Disposed;
 
     protected WatchingConfigurationProvider(string directory, string filter, bool includeSubdirectories, bool reloadOnChange) {
@@ -50,6 +52,9 @@ public abstract class WatchingConfigurationProvider : ConfigurationProvider, IDi
         m_Watcher.Deleted += OnFileEvent;
         m_Watcher.Renamed += OnFileEvent;
         m_Watcher.EnableRaisingEvents = true;
+
+        // The watcher and the debounce timer must not outlive the code, even if nobody disposes the provider.
+        m_LifetimeRegistration = CodeLifetime.OnStopping(GetType().Name, _ => Dispose());
     }
 
     private void OnFileEvent(object sender, FileSystemEventArgs e) {
@@ -76,6 +81,8 @@ public abstract class WatchingConfigurationProvider : ConfigurationProvider, IDi
 
     public void Dispose() {
         m_Disposed = true;
+        m_LifetimeRegistration?.Dispose();
+        m_LifetimeRegistration = null;
         m_DebounceTimer?.Dispose();
         if (m_Watcher is not null) {
             m_Watcher.EnableRaisingEvents = false;
